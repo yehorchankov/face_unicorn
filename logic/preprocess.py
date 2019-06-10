@@ -75,7 +75,7 @@ def predict_result(file_to_compare, candidates):
 
     # matches = face_recognition.compare_faces(face_encodings, unk_face_encoding)
 
-    face_distances = face_recognition.face_distance(face_encodings, unk_face_encoding)
+    face_distances = face_recognition.face_distance(np.array(face_encodings), unk_face_encoding)
     face_distances = 1 / face_distances
 
     return names, face_distances
