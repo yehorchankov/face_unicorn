@@ -16,7 +16,7 @@ def get_image_from_request():
 def save_photo():
     file = get_image_from_request()
     filename = request.form['name']
-    extension = file.filename.split('.')[1]
+    extension = '.' + file.filename.split('.')[1]
     file_number = get_next_photo_number(filename, extension)
     filename = get_filename(filename, file_number, extension)
     file.save(os.path.join(config.root_dir, config.save_dir, filename))
