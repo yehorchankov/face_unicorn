@@ -1,7 +1,7 @@
 import flask
 import logging
 
-error_routes = flask.Blueprint('save', __name__, url_prefix='/api')
+error_routes = flask.Blueprint('error', __name__, url_prefix='/api')
 logger = logging.getLogger(__name__)
 
 
