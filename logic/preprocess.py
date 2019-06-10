@@ -44,12 +44,13 @@ def get_filename(name, number, ext):
 
 def get_next_photo_number(filename, ext='.png'):
     filename = get_filename(filename, 0, ext)
+    save_dir = os.path.join(config.root_dir, config.save_dir)
     # If the photo is first of a kind
-    if not os.path.isfile(os.path.join(config.root_dir, config.save_dir, filename)):
+    if not os.path.isfile(os.path.join(save_dir, filename)):
         return 0
     else:
         filename_mask = filename + '_*_' + ext
-        file_numbers = [int(x.split('_')[1]) for x in glob.glob(filename_mask)]
+        file_numbers = [int(x.split('_')[1]) for x in glob.glob(os.path.join(save_dir, filename_mask))]
         return max(file_numbers) + 1
 
 
