@@ -6,6 +6,7 @@ import os
 
 app = flask.Flask(__name__)
 utils.register_blueprints(app)
+logging.basicConfig(filename='log.log')
 
 
 if __name__ == '__main__':

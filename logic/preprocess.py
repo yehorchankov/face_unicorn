@@ -7,6 +7,7 @@ from matplotlib import image
 import io
 import numpy as np
 import cv2
+import logging
 
 
 def get_image_from_request():
@@ -72,15 +73,17 @@ def predict_result(file_to_compare, candidates):
             face_encoding = face_recognition.face_encodings(small_frame, [face_locations])
             names.append(name)
             face_encodings.append(face_encoding)
-
+            logging.info(f'predict_result - face encoding for {name}\n{face_encoding}')
     # matches = face_recognition.compare_faces(face_encodings, unk_face_encoding)
 
     face_distances = face_recognition.face_distance(np.array(face_encodings), unk_face_encoding)
     face_distances = 1 / face_distances
-
+    logging.info(f'predict_result - inverse predict_result\n{face_distances}')
     return names, face_distances
 
 
 def get_top_result(names, probas):
+    logging.info(f'get_top_result\n{names}\n{probas}')
     idx = np.argmax(np.array(probas))
+    logging.info(f'get_top_result\n{idx}')
     return names[idx] if type(idx) is int else names[idx[0]]
