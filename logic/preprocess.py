@@ -87,4 +87,4 @@ def get_top_result(names, probas):
     logger.info(f'get_top_result\n{names}\n{probas}')
     idx = np.argmin(np.array(probas))
     logger.info(f'get_top_result\n{idx}')
-    return names[idx] if type(idx) is int else names[idx[0]]
+    return names[idx[0]] if type(idx) is np.array else names[idx]
