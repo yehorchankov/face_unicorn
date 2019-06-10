@@ -83,8 +83,12 @@ def predict_result(file_to_compare, candidates):
     return names, face_distances
 
 
-def get_top_result(names, probas):
+def get_top_result(names, probas, threshold=0.4):
     logger.info(f'get_top_result\n{names}\n{probas}')
     idx = np.argmin(np.array(probas))
     logger.info(f'get_top_result\n{idx}')
+
+    if probas[idx] > threshold:
+        return 'No such face in database'
+
     return names[idx[0]] if type(idx) is np.array else names[idx]
