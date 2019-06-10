@@ -64,7 +64,7 @@ def predict_result(file_to_compare, candidates):
     face_locations = face_locations[0]  # Take only one face from pic
     unk_face_encoding = face_recognition.face_encodings(file_to_compare, [face_locations])
 
-    for name, faces_list in candidates:
+    for name, faces_list in candidates.items():
         for face in faces_list:
             small_frame = cv2.resize(face, (0, 0), fx=0.25, fy=0.25)
             face_locations = face_recognition.face_locations(small_frame)
