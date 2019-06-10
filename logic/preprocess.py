@@ -50,7 +50,7 @@ def get_next_photo_number(filename, ext='.png'):
         return 0
     else:
         filename_mask = filename + '_*_' + ext
-        file_numbers = [int(x.split('_')[1]) for x in glob.glob(os.path.join(save_dir, filename_mask))]
+        file_numbers = [int(os.path.basename(x).split('_')[1]) for x in glob.glob(os.path.join(save_dir, filename_mask))]
         return max(file_numbers) + 1
 
 
