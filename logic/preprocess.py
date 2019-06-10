@@ -65,27 +65,26 @@ def predict_result(file_to_compare, candidates):
     file_to_compare = cv2.resize(file_to_compare, (0, 0), fx=0.25, fy=0.25)
     face_locations = face_recognition.face_locations(file_to_compare)
     face_locations = face_locations[0]  # Take only one face from pic
-    unk_face_encoding = face_recognition.face_encodings(file_to_compare, [face_locations])
+    unk_face_encoding = face_recognition.face_encodings(file_to_compare, [face_locations])[0]
 
     for name, faces_list in candidates.items():
         for face in faces_list:
             small_frame = cv2.resize(face, (0, 0), fx=0.25, fy=0.25)
             face_locations = face_recognition.face_locations(small_frame)
             face_locations = face_locations[0]  # Take only one face from pic
-            face_encoding = face_recognition.face_encodings(small_frame, [face_locations])
+            face_encoding = face_recognition.face_encodings(small_frame, [face_locations])[0]
             names.append(name)
             face_encodings.append(face_encoding)
             logger.info(f'predict_result - face encoding for {name}\n{face_encoding}')
     # matches = face_recognition.compare_faces(face_encodings, unk_face_encoding)
 
     face_distances = face_recognition.face_distance(np.array(face_encodings), unk_face_encoding)
-    face_distances = 1 / face_distances
     logger.info(f'predict_result - inverse predict_result\n{face_distances}')
     return names, face_distances
 
 
 def get_top_result(names, probas):
     logger.info(f'get_top_result\n{names}\n{probas}')
-    idx = np.argmax(np.array(probas))
+    idx = np.argmin(np.array(probas))
     logger.info(f'get_top_result\n{idx}')
     return names[idx] if type(idx) is int else names[idx[0]]
