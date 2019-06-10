@@ -1,6 +1,7 @@
 import logging
 import flask
 from logic import preprocess
+from flask import jsonify
 
 predict_routes = flask.Blueprint('predict', __name__, url_prefix='/api')
 logger = logging.getLogger(__name__)
@@ -17,4 +18,4 @@ def predict():
     top_result = preprocess.get_top_result(names, probas)
 
     logger.info('Predict request finished')
-    return {'result': top_result, 'name': names, 'probas': probas}
+    return jsonify({'result': top_result, 'name': names, 'probas': probas}), 200
