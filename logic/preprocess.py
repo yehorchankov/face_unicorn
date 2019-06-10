@@ -51,7 +51,8 @@ def get_next_photo_number(filename, ext='.png'):
 
 
 def image_to_ndarray(file):
-    return image.imread(io.BytesIO(file.read()))
+    extension = file.filename.split('.')[1]
+    return image.imread(io.BytesIO(file.read()), extension)
 
 
 def predict_result(file_to_compare, candidates):
