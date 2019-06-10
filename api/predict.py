@@ -18,4 +18,4 @@ def predict():
     top_result = preprocess.get_top_result(names, probas)
 
     logger.info('Predict request finished')
-    return jsonify({'result': top_result, 'name': names, 'probas': probas}), 200
+    return jsonify({'result': top_result, 'name': list(names), 'probas': list(probas)}), 200
