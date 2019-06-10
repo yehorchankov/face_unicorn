@@ -84,7 +84,7 @@ def predict_result(file_to_compare, candidates):
     return names, face_distances
 
 
-def get_top_result(names, probas, threshold=0.4):
+def get_top_result(names, probas, threshold=0.6):
     logger.info(f'get_top_result\n{names}\n{probas}')
     idx = np.argmin(np.array(probas))
     logger.info(f'get_top_result\n{idx}')
