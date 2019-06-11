@@ -1,10 +1,12 @@
-import flask
-import logging
-from config import utils
-import config
 import os
+import flask
+from flask_cors import CORS
+import logging
+import config
+from config import utils
 
 app = flask.Flask(__name__)
+CORS(app)
 utils.register_blueprints(app)
 logging.basicConfig(filename='log.log', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
