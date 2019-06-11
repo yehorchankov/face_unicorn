@@ -3,3 +3,4 @@ face_recognition
 numpy
 matplotlib
 opencv-python
+flask_cors
