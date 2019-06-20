@@ -76,7 +76,7 @@ def predict_result(file_to_compare, names, face_encodings, rescale_factor):
         face_distances = face_recognition.face_distance(face_encodings, unk_face_encoding)
         top_result = get_top_result(names, face_distances)
         results.append(top_result)
-        results.append(unk_face_location)
+        locations.append(unk_face_location)
         logger.info(f'Face predicted: {top_result}')
 
     return results, locations
