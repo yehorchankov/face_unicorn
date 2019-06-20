@@ -9,8 +9,10 @@ import numpy as np
 import cv2
 import logging
 import const
+import matplotlib.pyplot as plt
+from io import BytesIO
 import flask
-from skimage.io import imsave
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 logger = logging.getLogger(__name__)
 
@@ -122,9 +124,20 @@ def render_name_frames(image, names, locations, rescale_factor):
     return image
 
 
-def prepare_flask_image_response(img_array, mimetype='image/png'):
-    output = io.StringIO()
-    imsave(output, img_array, plugin='pil', format_str='png')
+def prepare_flask_image_response(plt_figure, mimetype='image/png'):
+    canvas = FigureCanvasAgg(plt_figure)
+    output = BytesIO()
+    canvas.print_png(output)
     response = flask.make_response(output.getvalue())
     response.mimetype = mimetype
     return response
+
+
+def array2image(img_array):
+    plt.ioff()
+    fig = plt.figure(frameon=False)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    ax.imshow(img_array)
+    fig.add_axes(ax)
+    return fig
