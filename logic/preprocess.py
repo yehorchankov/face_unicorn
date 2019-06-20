@@ -90,8 +90,8 @@ def flatten_candidates(candidates, rescale_factor):
             face_locations = face_recognition.face_locations(small_frame)
             face_encoding = face_recognition.face_encodings(small_frame, face_locations)
             names.append(name)
-            face_encodings.append(face_encoding)
-            logger.info(f'predict_result - face encoding for {name}\n{face_encoding}')
+            face_encodings.append(face_encoding[0])
+            logger.info(f'predict_result - face encoding for {name}\n{face_encoding[0]}')
     return names, face_encodings
 
 
