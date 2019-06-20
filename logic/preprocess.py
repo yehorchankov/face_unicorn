@@ -9,9 +9,8 @@ import numpy as np
 import cv2
 import logging
 import const
-from io import BytesIO
 import flask
-from matplotlib.backends.backend_agg import FigureCanvasAgg
+from skimage.io import imsave
 
 logger = logging.getLogger(__name__)
 
@@ -119,13 +118,13 @@ def render_name_frames(image, names, locations, rescale_factor):
         cv2.rectangle(image, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        logging.info(f'Image {image}')
     return image
 
 
-def prepare_flask_image_response(plt_figure, mimetype='image/png'):
-    canvas = FigureCanvasAgg(plt_figure)
-    output = BytesIO()
-    canvas.print_png(output)
+def prepare_flask_image_response(img_array, mimetype='image/png'):
+    output = io.StringIO()
+    imsave(output, img_array, plugin='pil', format_str='png')
     response = flask.make_response(output.getvalue())
     response.mimetype = mimetype
     return response
