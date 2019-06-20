@@ -61,7 +61,7 @@ def get_next_photo_number(filename, ext='.png'):
 
 def image_to_ndarray(file):
     extension = file.filename.split('.')[1]
-    return image.imread(io.BytesIO(file.read()), extension)
+    return image.imread(io.BytesIO(file.read()), extension).astype(int)
 
 
 def predict_result(file_to_compare, names, face_encodings, rescale_factor):
@@ -108,10 +108,10 @@ def get_top_result(names, probas, threshold=0.6):
 def render_name_frames(image, names, locations, rescale_factor):
     for (top, right, bottom, left), name in zip(locations, names):
         # Scale back up face locations since the frame we detected in was scaled to rescale_factor size
-        top /= rescale_factor
-        right /= rescale_factor
-        bottom /= rescale_factor
-        left /= rescale_factor
+        top = int(top / rescale_factor)
+        right = int(right / rescale_factor)
+        bottom = int(bottom / rescale_factor)
+        left = int(left / rescale_factor)
 
         # Draw a box around the face
         cv2.rectangle(image, (left, top), (right, bottom), (0, 0, 255), 2)
