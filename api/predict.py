@@ -1,7 +1,7 @@
 import logging
 import flask
 from logic import preprocess
-from flask import jsonify
+import const
 
 predict_routes = flask.Blueprint('predict', __name__, url_prefix='/api')
 logger = logging.getLogger(__name__)
@@ -14,8 +14,10 @@ def predict():
     file = preprocess.get_image_from_request()
     file_array = preprocess.image_to_ndarray(file)
     candidates = preprocess.load_photos()
-    names, probas = preprocess.predict_result(file_array, candidates)
-    top_result = preprocess.get_top_result(names, probas)
+    names, face_encodings = preprocess.flatten_candidates(candidates, const.rescale_factor)
+    names, locations = preprocess.predict_result(file_array, names, face_encodings, const.rescale_factor)
+    image = preprocess.render_name_frames(file, names, locations, const.rescale_factor)
+    image_response = preprocess.prepare_flask_image_response(image)
 
     logger.info('Predict request finished')
-    return jsonify({'result': top_result, 'name': list(names), 'probas': list(probas)}), 200
+    return image_response, 200

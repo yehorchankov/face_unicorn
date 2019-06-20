@@ -8,6 +8,10 @@ import io
 import numpy as np
 import cv2
 import logging
+import const
+from io import BytesIO
+import flask
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 logger = logging.getLogger(__name__)
 
@@ -59,29 +63,36 @@ def image_to_ndarray(file):
     return image.imread(io.BytesIO(file.read()), extension)
 
 
-def predict_result(file_to_compare, candidates):
+def predict_result(file_to_compare, names, face_encodings, rescale_factor):
+    results = []
+    locations = []
+
+    file_to_compare = cv2.resize(file_to_compare, (0, 0), fx=rescale_factor, fy=rescale_factor)
+    unk_face_locations = face_recognition.face_locations(file_to_compare)
+    unk_face_encodings = face_recognition.face_encodings(file_to_compare, unk_face_locations)
+
+    for unk_face_encoding, unk_face_location in zip(unk_face_encodings, unk_face_locations):
+        face_distances = face_recognition.face_distance(face_encodings, unk_face_encoding)
+        top_result = get_top_result(names, face_distances)
+        results.append(top_result)
+        results.append(unk_face_location)
+        logger.info(f'Face predicted: {top_result}')
+
+    return results, locations
+
+
+def flatten_candidates(candidates, rescale_factor):
     names = []
     face_encodings = []
-
-    file_to_compare = cv2.resize(file_to_compare, (0, 0), fx=0.25, fy=0.25)
-    face_locations = face_recognition.face_locations(file_to_compare)
-    face_locations = face_locations[0]  # Take only one face from pic
-    unk_face_encoding = face_recognition.face_encodings(file_to_compare, [face_locations])[0]
-
     for name, faces_list in candidates.items():
         for face in faces_list:
-            small_frame = cv2.resize(face, (0, 0), fx=0.25, fy=0.25)
+            small_frame = cv2.resize(face, (0, 0), fx=rescale_factor, fy=rescale_factor)
             face_locations = face_recognition.face_locations(small_frame)
-            face_locations = face_locations[0]  # Take only one face from pic
-            face_encoding = face_recognition.face_encodings(small_frame, [face_locations])[0]
+            face_encoding = face_recognition.face_encodings(small_frame, face_locations)
             names.append(name)
             face_encodings.append(face_encoding)
             logger.info(f'predict_result - face encoding for {name}\n{face_encoding}')
-    # matches = face_recognition.compare_faces(face_encodings, unk_face_encoding)
-
-    face_distances = face_recognition.face_distance(np.array(face_encodings), unk_face_encoding)
-    logger.info(f'predict_result - inverse predict_result\n{face_distances}')
-    return names, face_distances
+    return names, face_encodings
 
 
 def get_top_result(names, probas, threshold=0.6):
@@ -90,6 +101,33 @@ def get_top_result(names, probas, threshold=0.6):
     logger.info(f'get_top_result\n{idx}')
 
     if probas[idx] > threshold:
-        return 'No such face in database'
+        return const.unknown_face
 
-    return names[idx[0]] if type(idx) is np.array else names[idx]
+    return names[idx[0]]
+
+
+def render_name_frames(image, names, locations, rescale_factor):
+    for (top, right, bottom, left), name in zip(locations, names):
+        # Scale back up face locations since the frame we detected in was scaled to rescale_factor size
+        top /= rescale_factor
+        right /= rescale_factor
+        bottom /= rescale_factor
+        left /= rescale_factor
+
+        # Draw a box around the face
+        cv2.rectangle(image, (left, top), (right, bottom), (0, 0, 255), 2)
+
+        # Draw a label with a name below the face
+        cv2.rectangle(image, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        font = cv2.FONT_HERSHEY_DUPLEX
+        cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+    return image
+
+
+def prepare_flask_image_response(plt_figure, mimetype='image/png'):
+    canvas = FigureCanvasAgg(plt_figure)
+    output = BytesIO()
+    canvas.print_png(output)
+    response = flask.make_response(output.getvalue())
+    response.mimetype = mimetype
+    return response
