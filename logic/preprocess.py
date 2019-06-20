@@ -3,7 +3,7 @@ from flask import request
 import os
 import config
 import glob
-from matplotlib import image
+from matplotlib.image import imread
 import io
 import numpy as np
 import cv2
@@ -61,7 +61,7 @@ def get_next_photo_number(filename, ext='.png'):
 
 def image_to_ndarray(file):
     extension = file.filename.split('.')[1]
-    return image.imread(io.BytesIO(file.read()), extension).astype(int)
+    return imread(io.BytesIO(file.read()), extension)
 
 
 def predict_result(file_to_compare, names, face_encodings, rescale_factor):
@@ -106,6 +106,7 @@ def get_top_result(names, probas, threshold=0.6):
 
 
 def render_name_frames(image, names, locations, rescale_factor):
+    image = image.astype(int)
     for (top, right, bottom, left), name in zip(locations, names):
         # Scale back up face locations since the frame we detected in was scaled to rescale_factor size
         top = int(top / rescale_factor)
