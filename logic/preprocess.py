@@ -99,11 +99,9 @@ def get_top_result(names, probas, threshold=0.6):
     logger.info(f'get_top_result\n{names}\n{probas}')
     idx = np.argmin(np.array(probas))
     logger.info(f'get_top_result\n{idx}')
-
     if probas[idx] > threshold:
         return const.unknown_face
-
-    return names[idx[0]]
+    return names[idx]
 
 
 def render_name_frames(image, names, locations, rescale_factor):
