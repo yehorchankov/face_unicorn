@@ -120,19 +120,17 @@ def render_name_frames(image, names, locations, rescale_factor):
         cv2.rectangle(image, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # Draw a label with a name below the face
-        cv2.rectangle(image, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        cv2.rectangle(image, (left, bottom - 34), (right, bottom), (0, 0, 255), cv2.FILLED)
         # font = cv2.FONT_HERSHEY_DUPLEX
         # cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     img_pil = Image.fromarray(image)
     draw = ImageDraw.Draw(img_pil)
     for (top, right, bottom, left), name in zip(locations, names):
-        top = int(top / rescale_factor)
-        right = int(right / rescale_factor)
         bottom = int(bottom / rescale_factor)
         left = int(left / rescale_factor)
 
-        draw.text((left + 6, bottom - 6), name, font=font, fill=(255, 255, 255, 255))
+        draw.text((left + 6, bottom - 40), name, font=font, fill=(255, 255, 255, 255))
     image = np.array(img_pil)
     del draw
 
