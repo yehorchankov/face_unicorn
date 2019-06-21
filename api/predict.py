@@ -19,6 +19,7 @@ def predict():
     image = preprocess.render_name_frames(file_array, names, locations, const.rescale_factor)
     #image_fig = preprocess.array2image(image)
     logger.info('Predict request finished')
+    extension = preprocess.fix_extension(extension)
     return preprocess.return_flask_image_response(image, extension)
 
     #return image_response, 200

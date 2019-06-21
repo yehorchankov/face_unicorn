@@ -137,9 +137,9 @@ def render_name_frames(image, names, locations, rescale_factor):
 
 
 def return_flask_image_response(pil_img, extension):
-    mimetype = const.mimetypes[extension]
+    mimetype = const.mimetypes['png']
     img_io = io.StringIO()
-    pil_img.save(img_io, mimetype, quality=100)
+    pil_img.save(img_io, 'PNG')
     img_io.seek(0)
     return flask.send_file(img_io, mimetype=mimetype)
     # canvas = FigureCanvasAgg(plt_figure)
