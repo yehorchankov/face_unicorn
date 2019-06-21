@@ -9,10 +9,7 @@ import numpy as np
 import cv2
 import logging
 import const
-import matplotlib.pyplot as plt
-from io import BytesIO
 import flask
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 from PIL import ImageFont, ImageDraw, Image
 
 logger = logging.getLogger(__name__)
@@ -115,46 +112,33 @@ def render_name_frames(image, names, locations, rescale_factor):
         right = int(right / rescale_factor)
         bottom = int(bottom / rescale_factor)
         left = int(left / rescale_factor)
-
         # Draw a box around the face
         cv2.rectangle(image, (left, top), (right, bottom), (0, 0, 255), 2)
-
         # Draw a label with a name below the face
         cv2.rectangle(image, (left, bottom - 34), (right, bottom), (0, 0, 255), cv2.FILLED)
-        # font = cv2.FONT_HERSHEY_DUPLEX
-        # cv2.putText(image, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     img_pil = Image.fromarray(image)
     draw = ImageDraw.Draw(img_pil)
     for (top, right, bottom, left), name in zip(locations, names):
         bottom = int(bottom / rescale_factor)
         left = int(left / rescale_factor)
-
         draw.text((left + 6, bottom - 40), name, font=font, fill=(255, 255, 255, 255))
     del draw
 
     return img_pil
 
 
-def return_flask_image_response(pil_img, extension):
+def rescale_image(pil_img):
+    if pil_img.size[0] > 1000 or pil_img.size[1] > 1000:
+        rescaled_h = pil_img.size[1] / pil_img.size[0] * 1000
+        return pil_img.resize((1000, int(rescaled_h)))
+    else:
+        return pil_img
+
+
+def return_flask_image_response(pil_img):
     mimetype = const.mimetypes['png']
-    img_io = io.StringIO()
+    img_io = io.BytesIO()
     pil_img.save(img_io, 'PNG')
     img_io.seek(0)
     return flask.send_file(img_io, mimetype=mimetype)
-    # canvas = FigureCanvasAgg(plt_figure)
-    # output = BytesIO()
-    # canvas.print_png(output)
-    # response = flask.make_response(output.getvalue())
-    # response.mimetype = mimetype
-    # return response
-
-
-def array2image(img_array):
-    plt.ioff()
-    fig = plt.figure(frameon=False)
-    ax = plt.Axes(fig, [0., 0., 1., 1.])
-    ax.set_axis_off()
-    ax.imshow(img_array)
-    fig.add_axes(ax)
-    return fig

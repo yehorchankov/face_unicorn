@@ -1,4 +1,4 @@
-unknown_face = 'Неизвестный человек'
+unknown_face = 'Неизвестный'
 rescale_factor = 0.25
 font = './fonts/OpenSans-Regular.ttf'
 mimetypes = {
