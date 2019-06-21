@@ -129,9 +129,11 @@ def render_name_frames(image, names, locations, rescale_factor):
 
 
 def rescale_image(pil_img):
+    factor = 0.5
     if pil_img.size[0] > 1000 or pil_img.size[1] > 1000:
-        rescaled_h = pil_img.size[1] / pil_img.size[0] * 1000
-        return pil_img.resize((1000, int(rescaled_h)))
+        rescaled_w = pil_img.size[0] * factor
+        rescaled_h = pil_img.size[1] / pil_img.size[0] * rescaled_w
+        return pil_img.resize((int(rescaled_w), int(rescaled_h)), Image.ANTIALIAS)
     else:
         return pil_img
 
