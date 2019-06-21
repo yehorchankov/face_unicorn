@@ -12,13 +12,13 @@ def predict():
     logger.info('Predict request started')
 
     file = preprocess.get_image_from_request()
-    file_array = preprocess.image_to_ndarray(file)
+    file_array, extension = preprocess.image_to_ndarray(file)
     candidates = preprocess.load_photos()
     names, face_encodings = preprocess.flatten_candidates(candidates, const.rescale_factor)
     names, locations = preprocess.predict_result(file_array, names, face_encodings, const.rescale_factor)
     image = preprocess.render_name_frames(file_array, names, locations, const.rescale_factor)
-    image_fig = preprocess.array2image(image)
-    image_response = preprocess.prepare_flask_image_response(image_fig)
-
+    #image_fig = preprocess.array2image(image)
     logger.info('Predict request finished')
-    return image_response, 200
+    return preprocess.return_flask_image_response(image, extension)
+
+    #return image_response, 200

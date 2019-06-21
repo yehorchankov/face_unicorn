@@ -62,7 +62,7 @@ def get_next_photo_number(filename, ext='.png'):
 
 def image_to_ndarray(file):
     extension = file.filename.split('.')[1]
-    return imread(io.BytesIO(file.read()), extension)
+    return imread(io.BytesIO(file.read()), extension), extension
 
 
 def predict_result(file_to_compare, names, face_encodings, rescale_factor):
@@ -131,19 +131,23 @@ def render_name_frames(image, names, locations, rescale_factor):
         left = int(left / rescale_factor)
 
         draw.text((left + 6, bottom - 40), name, font=font, fill=(255, 255, 255, 255))
-    image = np.array(img_pil)
     del draw
 
-    return image
+    return img_pil
 
 
-def prepare_flask_image_response(plt_figure, mimetype='image/png'):
-    canvas = FigureCanvasAgg(plt_figure)
-    output = BytesIO()
-    canvas.print_png(output)
-    response = flask.make_response(output.getvalue())
-    response.mimetype = mimetype
-    return response
+def return_flask_image_response(pil_img, extension):
+    mimetype = const.mimetypes[extension]
+    img_io = io.StringIO()
+    pil_img.save(img_io, mimetype, quality=100)
+    img_io.seek(0)
+    return flask.send_file(img_io, mimetype=mimetype)
+    # canvas = FigureCanvasAgg(plt_figure)
+    # output = BytesIO()
+    # canvas.print_png(output)
+    # response = flask.make_response(output.getvalue())
+    # response.mimetype = mimetype
+    # return response
 
 
 def array2image(img_array):
