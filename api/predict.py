@@ -18,6 +18,6 @@ def predict():
     candidates = preprocess.load_photos()
     names, face_encodings = preprocess.flatten_candidates(candidates, const.rescale_factor)
     names, locations = preprocess.predict_result(pil_image, names, face_encodings)
-    image = preprocess.render_name_frames(pil_image, names, locations, rescale_factor)
+    image = preprocess.render_name_frames(pil_image, names, locations)
     logger.info('Predict request finished')
     return preprocess.return_flask_image_response(image)

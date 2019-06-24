@@ -77,7 +77,7 @@ def predict_result(file_to_compare, names, face_encodings):
     locations = []
 
     file_to_compare_np = to_np(file_to_compare)
-    unk_face_locations = face_recognition.face_locations(file_to_compare_np, number_of_times_to_upsample=2, model='cnn')
+    unk_face_locations = face_recognition.face_locations(file_to_compare_np)
     unk_face_encodings = face_recognition.face_encodings(file_to_compare_np, unk_face_locations)
 
     logger.info(f'Predicting {len(unk_face_encodings)} faces')
@@ -115,7 +115,7 @@ def get_top_result(names, probas, threshold=0.6):
     return names[idx]
 
 
-def render_name_frames(img_pil, names, locations, rescale_factor):
+def render_name_frames(img_pil, names, locations):
     draw = ImageDraw.Draw(img_pil)
     font = ImageFont.truetype(const.font, 30)
 
@@ -123,12 +123,12 @@ def render_name_frames(img_pil, names, locations, rescale_factor):
 
     for (top, right, bottom, left), name in zip(locations, names):
         # Scale back up face locations since the frame we detected in was scaled to rescale_factor size
-        top = int(top / rescale_factor)
-        right = int(right / rescale_factor)
-        bottom = int(bottom / rescale_factor)
-        left = int(left / rescale_factor)
+        top = int(top)
+        right = int(right)
+        bottom = int(bottom)
+        left = int(left)
         # Draw a box around the face
-        draw.rectangle([left, top, right, bottom], fill=None, outline=(0, 0, 255))
+        draw.rectangle([left, top, right, bottom], fill=None, outline=(0, 0, 255), width=5)
         draw.rectangle([left, bottom - 34, right, bottom], fill=(0, 0, 255), outline=(0, 0, 255))
         # Draw a label with a name below the face
         draw.text((left + 6, bottom - 40), name, font=font, fill=(255, 255, 255, 255))
@@ -138,9 +138,13 @@ def render_name_frames(img_pil, names, locations, rescale_factor):
 
 
 def get_rescale_factor(pil_img):
-    factor = 0.25
-    if pil_img.size[0] <= 1000 or pil_img.size[1] <= 1000:
-        factor = 2
+    factor = 1
+    min_size = min(pil_img.size[0], pil_img.size[1])
+    max_size = max(pil_img.size[0], pil_img.size[1])
+    if min_size < 1000:
+        factor = 1000 / min_size
+    elif max_size > 2000:
+        factor = 2000 / max_size
     return factor
 
 
