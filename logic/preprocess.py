@@ -9,8 +9,9 @@ import numpy as np
 import cv2
 import logging
 import const
-import flask
 from PIL import ImageFont, ImageDraw, Image
+from base64 import b64encode
+
 
 logger = logging.getLogger(__name__)
 
@@ -139,8 +140,8 @@ def rescale_image(pil_img):
 
 
 def return_flask_image_response(pil_img):
-    mimetype = const.mimetypes['png']
     img_io = io.BytesIO()
     pil_img.save(img_io, 'PNG')
-    img_io.seek(0)
-    return flask.send_file(img_io, mimetype=mimetype)
+    data = b64encode(pil_img.getvalue()).decode('ascii')
+    #img_io.seek(0)
+    return data
