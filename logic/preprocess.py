@@ -142,6 +142,6 @@ def rescale_image(pil_img):
 def return_flask_image_response(pil_img):
     img_io = io.BytesIO()
     pil_img.save(img_io, 'PNG')
-    data = b64encode(pil_img.getvalue()).decode('ascii')
+    data = b64encode(img_io.getvalue()).decode('ascii')
     #img_io.seek(0)
     return data
