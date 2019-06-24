@@ -63,13 +63,22 @@ def image_to_ndarray(file):
     return imread(io.BytesIO(file.read()), extension), extension
 
 
-def predict_result(file_to_compare, names, face_encodings, rescale_factor):
+def to_pil(img_array):
+    return Image.fromarray(img_array)
+
+
+def to_np(img_pil):
+    return np.array(img_pil)
+
+
+def predict_result(file_to_compare, names, face_encodings, rescale_factor=1):
     results = []
     locations = []
 
-    file_to_compare = cv2.resize(file_to_compare, (0, 0), fx=rescale_factor, fy=rescale_factor)
-    unk_face_locations = face_recognition.face_locations(file_to_compare, number_of_times_to_upsample=1, model='cnn')
-    unk_face_encodings = face_recognition.face_encodings(file_to_compare, unk_face_locations)
+    file_to_compare_rs = rescale_image(file_to_compare, rescale_factor)
+    file_to_compare_np = to_np(file_to_compare_rs)
+    unk_face_locations = face_recognition.face_locations(file_to_compare_np, number_of_times_to_upsample=2, model='cnn')
+    unk_face_encodings = face_recognition.face_encodings(file_to_compare_np, unk_face_locations)
 
     logger.info(f'Predicting {len(unk_face_encodings)} faces')
 
@@ -106,7 +115,8 @@ def get_top_result(names, probas, threshold=0.6):
     return names[idx]
 
 
-def render_name_frames(image, names, locations, rescale_factor):
+def render_name_frames(img_pil, names, locations, rescale_factor):
+    draw = ImageDraw.Draw(img_pil)
     font = ImageFont.truetype(const.font, 32)
 
     logger.info(f'Rendering frames for {len(locations)} faces')
@@ -118,29 +128,26 @@ def render_name_frames(image, names, locations, rescale_factor):
         bottom = int(bottom / rescale_factor)
         left = int(left / rescale_factor)
         # Draw a box around the face
-        cv2.rectangle(image, (left, top), (right, bottom), (0, 0, 255), 2)
+        draw.rectangle([left, top, right, bottom], fill=None, outline=(0, 0, 255))
+        draw.rectangle([left, bottom - 34, right, bottom], fill=(0, 0, 255), outline=(0, 0, 255))
         # Draw a label with a name below the face
-        cv2.rectangle(image, (left, bottom - 34), (right, bottom), (0, 0, 255), cv2.FILLED)
-
-    img_pil = Image.fromarray(image)
-    draw = ImageDraw.Draw(img_pil)
-    for (top, right, bottom, left), name in zip(locations, names):
-        bottom = int(bottom / rescale_factor)
-        left = int(left / rescale_factor)
         draw.text((left + 6, bottom - 40), name, font=font, fill=(255, 255, 255, 255))
     del draw
 
     return img_pil
 
 
-def rescale_image(pil_img):
-    factor = 0.5
-    if pil_img.size[0] > 1000 or pil_img.size[1] > 1000:
-        rescaled_w = pil_img.size[0] * factor
-        rescaled_h = pil_img.size[1] / pil_img.size[0] * rescaled_w
-        return pil_img.resize((int(rescaled_w), int(rescaled_h)), Image.ANTIALIAS)
-    else:
-        return pil_img
+def get_rescale_factor(pil_img):
+    factor = 0.25
+    if pil_img.size[0] <= 1000 or pil_img.size[1] <= 1000:
+        factor = 2
+    return factor
+
+
+def rescale_image(pil_img, factor):
+    rescaled_w = pil_img.size[0] * factor
+    rescaled_h = pil_img.size[1] / pil_img.size[0] * rescaled_w
+    return pil_img.resize((int(rescaled_w), int(rescaled_h)), Image.ANTIALIAS)
 
 
 def return_flask_image_response(pil_img):
