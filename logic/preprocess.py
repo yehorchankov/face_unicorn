@@ -68,15 +68,15 @@ def to_pil(img_array):
 
 
 def to_np(img_pil):
+    logger.info(f'Converting to np {img_pil.size}')
     return np.array(img_pil)
 
 
-def predict_result(file_to_compare, names, face_encodings, rescale_factor=1):
+def predict_result(file_to_compare, names, face_encodings):
     results = []
     locations = []
 
-    file_to_compare_rs = rescale_image(file_to_compare, rescale_factor)
-    file_to_compare_np = to_np(file_to_compare_rs)
+    file_to_compare_np = to_np(file_to_compare)
     unk_face_locations = face_recognition.face_locations(file_to_compare_np, number_of_times_to_upsample=2, model='cnn')
     unk_face_encodings = face_recognition.face_encodings(file_to_compare_np, unk_face_locations)
 
@@ -117,7 +117,7 @@ def get_top_result(names, probas, threshold=0.6):
 
 def render_name_frames(img_pil, names, locations, rescale_factor):
     draw = ImageDraw.Draw(img_pil)
-    font = ImageFont.truetype(const.font, 32)
+    font = ImageFont.truetype(const.font, 30)
 
     logger.info(f'Rendering frames for {len(locations)} faces')
 
@@ -147,6 +147,7 @@ def get_rescale_factor(pil_img):
 def rescale_image(pil_img, factor):
     rescaled_w = pil_img.size[0] * factor
     rescaled_h = pil_img.size[1] / pil_img.size[0] * rescaled_w
+    logger.info(f'Rescaling image with size of {pil_img.size} to {rescaled_w} x {rescaled_h}')
     return pil_img.resize((int(rescaled_w), int(rescaled_h)), Image.ANTIALIAS)
 
 
