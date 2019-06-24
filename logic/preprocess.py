@@ -71,6 +71,8 @@ def predict_result(file_to_compare, names, face_encodings, rescale_factor):
     unk_face_locations = face_recognition.face_locations(file_to_compare)
     unk_face_encodings = face_recognition.face_encodings(file_to_compare, unk_face_locations)
 
+    logger.info(f'Predicting {len(unk_face_encodings)} faces')
+
     for unk_face_encoding, unk_face_location in zip(unk_face_encodings, unk_face_locations):
         face_distances = face_recognition.face_distance(face_encodings, unk_face_encoding)
         top_result = get_top_result(names, face_distances)
@@ -91,7 +93,7 @@ def flatten_candidates(candidates, rescale_factor):
             face_encoding = face_recognition.face_encodings(small_frame, face_locations)
             names.append(name)
             face_encodings.append(face_encoding[0])
-            logger.info(f'predict_result - face encoding for {name}\n{face_encoding[0]}')
+            logger.info(f'name: {name} | face len: {len(face)} - flattened')
     return names, face_encodings
 
 
@@ -106,6 +108,8 @@ def get_top_result(names, probas, threshold=0.6):
 
 def render_name_frames(image, names, locations, rescale_factor):
     font = ImageFont.truetype(const.font, 32)
+
+    logger.info(f'Rendering frames for {len(locations)} faces')
 
     for (top, right, bottom, left), name in zip(locations, names):
         # Scale back up face locations since the frame we detected in was scaled to rescale_factor size
@@ -143,5 +147,4 @@ def return_flask_image_response(pil_img):
     img_io = io.BytesIO()
     pil_img.save(img_io, 'PNG')
     data = b64encode(img_io.getvalue()).decode('ascii')
-    #img_io.seek(0)
     return data
