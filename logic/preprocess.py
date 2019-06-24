@@ -68,7 +68,7 @@ def predict_result(file_to_compare, names, face_encodings, rescale_factor):
     locations = []
 
     file_to_compare = cv2.resize(file_to_compare, (0, 0), fx=rescale_factor, fy=rescale_factor)
-    unk_face_locations = face_recognition.face_locations(file_to_compare)
+    unk_face_locations = face_recognition.face_locations(file_to_compare, number_of_times_to_upsample=1, model='cnn')
     unk_face_encodings = face_recognition.face_encodings(file_to_compare, unk_face_locations)
 
     logger.info(f'Predicting {len(unk_face_encodings)} faces')
