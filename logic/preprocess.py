@@ -43,7 +43,7 @@ def load_photos():
 
 
 def get_filename(name, number, ext):
-    return name + '_' + str(number) + '_' + ext
+    return f'{name}_{number}_{ext}'
 
 
 def get_next_photo_number(filename, ext='.png'):
@@ -53,7 +53,7 @@ def get_next_photo_number(filename, ext='.png'):
     if not os.path.isfile(os.path.join(save_dir, filename_zero)):
         return 0
     else:
-        filename_mask = filename + '_*_' + ext
+        filename_mask = f'{filename}_*_{ext}'
         file_numbers = [int(os.path.basename(x).split('_')[1]) for x in glob.glob(os.path.join(save_dir, filename_mask))]
         return max(file_numbers) + 1
 
