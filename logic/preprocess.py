@@ -99,10 +99,11 @@ def flatten_candidates(candidates, rescale_factor):
         for face in faces_list:
             small_frame = cv2.resize(face, (0, 0), fx=rescale_factor, fy=rescale_factor)
             face_locations = face_recognition.face_locations(small_frame)
-            face_encoding = face_recognition.face_encodings(small_frame, face_locations)
-            names.append(name)
-            face_encodings.append(face_encoding[0])
-            logger.info(f'name: {name} | face len: {len(face)} - flattened')
+            face_encodings = face_recognition.face_encodings(small_frame, face_locations)
+            if len(face_encodings) > 0:
+                names.append(name)
+                face_encodings.append(face_encodings[0])
+                logger.info(f'name: {name} | face len: {len(face)} - flattened')
     return names, face_encodings
 
 
