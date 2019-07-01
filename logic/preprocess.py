@@ -94,7 +94,7 @@ def predict_result(file_to_compare, names, face_encodings):
 
 def flatten_candidates(candidates, rescale_factor):
     names = []
-    face_encodings = []
+    result_encodings = []
     for name, faces_list in candidates.items():
         for face in faces_list:
             small_frame = cv2.resize(face, (0, 0), fx=rescale_factor, fy=rescale_factor)
@@ -102,9 +102,9 @@ def flatten_candidates(candidates, rescale_factor):
             face_encodings = face_recognition.face_encodings(small_frame, face_locations)
             if len(face_encodings) > 0:
                 names.append(name)
-                face_encodings.append(face_encodings[0])
+                result_encodings.append(face_encodings[0])
                 logger.info(f'name: {name} | face len: {len(face)} - flattened')
-    return names, face_encodings
+    return names, result_encodings
 
 
 def get_top_result(names, probas, threshold=0.6):
